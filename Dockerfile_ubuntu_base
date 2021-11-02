@@ -1,0 +1,52 @@
+FROM ubuntu:20.04
+
+ARG DOTFILES_USER=svats2k
+
+# Colors and italics for tmux
+COPY xterm-256color-italic.terminfo /root
+RUN tic /root/xterm-256color-italic.terminfo
+ENV TERM=xterm-256color-italic
+
+ENV TZ=Asia/Kolkata
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+RUN apt-get update && \
+    apt-get -y upgrade && \
+    apt-get -y install \
+        software-properties-common \
+        build-essential \
+        dialog \
+        apt-utils \
+        cmake \
+        make \
+        git \
+        vim \
+        curl \
+        fzf \
+        wget \
+        tmux \
+        tzdata \
+        sudo \
+        tree \
+        python3 \
+        python3-pip \
+        zsh
+
+RUN chsh -s /usr/bin/zsh
+
+## neovim install
+RUN add-apt-repository -y ppa:neovim-ppa/unstable && \ 
+    apt-get update && \ 
+    apt-get install -y neovim
+
+RUN mkdir -p /root/.config
+COPY ./init.vim  /root/.config/init.vim
+
+## Installing zsh git repos
+RUN mkdir ~/.zsh && \
+    git clone https://github.com/zsh-users/zsh-autosuggestions.git ~/.zsh/zsh-autosuggestions && \
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.zsh/zsh-syntax-highlighting && \
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.zsh/powerlevel10k
+
+## chezmoi
+RUN sh -c "$(curl -fsLS git.io/chezmoi)" -- init --apply $DOTFILES_USER
