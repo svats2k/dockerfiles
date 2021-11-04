@@ -30,23 +30,17 @@ RUN apt-get update && \
         tree \
         python3 \
         python3-pip \
+        python3-venv \
         zsh
-
-RUN chsh -s /usr/bin/zsh
 
 ## neovim install
 RUN add-apt-repository -y ppa:neovim-ppa/unstable && \ 
     apt-get update && \ 
     apt-get install -y neovim
 
-RUN mkdir -p /root/.config
-COPY ./init.vim  /root/.config/init.vim
-
-## Installing zsh git repos
-RUN mkdir ~/.zsh && \
-    git clone https://github.com/zsh-users/zsh-autosuggestions.git ~/.zsh/zsh-autosuggestions && \
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.zsh/zsh-syntax-highlighting && \
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.zsh/powerlevel10k
-
 ## chezmoi
 RUN sh -c "$(curl -fsLS git.io/chezmoi)" -- init --apply $DOTFILES_USER
+
+# change shell to zsh
+CMD ["chsh",  "-s", "/usr/bin/zsh"]
+
