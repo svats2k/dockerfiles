@@ -1,0 +1,46 @@
+FROM nvidia/cude:11.4.2-base-ubuntu20.04
+
+ARG DOTFILES_USER=svats2k
+
+# Colors and italics for tmux
+COPY xterm-256color-italic.terminfo /root
+RUN tic /root/xterm-256color-italic.terminfo
+ENV TERM=xterm-256color-italic
+
+ENV TZ=Asia/Kolkata
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+RUN apt-get update && \
+    apt-get -y upgrade && \
+    apt-get -y install \
+        software-properties-common \
+        build-essential \
+        dialog \
+        apt-utils \
+        cmake \
+        make \
+        git \
+        vim \
+        curl \
+        fzf \
+        wget \
+        tmux \
+        tzdata \
+        sudo \
+        tree \
+        python3 \
+        python3-pip \
+        python3-venv \
+        zsh
+
+## neovim install
+RUN add-apt-repository -y ppa:neovim-ppa/unstable && \ 
+    apt-get update && \ 
+    apt-get install -y neovim
+
+## chezmoi
+RUN sh -c "$(curl -fsLS git.io/chezmoi)" -- init --apply $DOTFILES_USER
+
+# change shell to zsh
+CMD ["chsh",  "-s", "/usr/bin/zsh"]
+
