@@ -1,0 +1,9 @@
+FROM srivatsasrinath/ubuntu-base:alpha
+
+ARG DOTFILES_USER=svats2k
+
+## chezmoi
+RUN sh -c "$(curl -fsLS git.io/chezmoi)" -- init --apply $DOTFILES_USER
+
+# change shell to zsh
+CMD ["chsh",  "-s", "/usr/bin/zsh"]

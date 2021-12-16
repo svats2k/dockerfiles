@@ -1,5 +1,8 @@
 FROM ubuntu:20.04
 
+ARG USER_ID
+ARG GROUP_ID
+
 # Colors and italics for tmux
 COPY xterm-256color-italic.terminfo /root
 RUN tic /root/xterm-256color-italic.terminfo
@@ -39,6 +42,14 @@ RUN apt-get update && \
 RUN add-apt-repository -y ppa:neovim-ppa/unstable && \ 
     apt-get update && \ 
     apt-get install -y neovim
+
+RUN addgroup --gid $GROUP_ID user
+RUN adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID user
+USER user
+
+# Build with the following command
+# docker build -t myimage --build-arg USER_ID=$(id -u) \
+#   --build-arg GROUP_ID=$(id -g) .
 
 # change shell to zsh
 CMD ["chsh",  "-s", "/usr/bin/zsh"]
